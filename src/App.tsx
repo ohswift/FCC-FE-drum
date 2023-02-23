@@ -1,257 +1,253 @@
-import React, { ChangeEvent, CSSProperties } from "react";
+import React, { ChangeEvent, CSSProperties, MouseEvent } from "react";
 
-interface BankType {
-  keyCode: string;
-  id: string;
-  url: string;
+type LengthControlType = "Break" | "Session";
+
+interface LengthControlProps {
+  type: string;
+  count: number;
+  handleClick: (sign: string, value: number) => void;
 }
-
-const bankOne: BankType[] = [
-  {
-    keyCode: "Q",
-    id: "Heater-1",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3",
-  },
-  {
-    keyCode: "W",
-    id: "Heater-2",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-2.mp3",
-  },
-  {
-    keyCode: "E",
-    id: "Heater-3",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-3.mp3",
-  },
-  {
-    keyCode: "A",
-    id: "Heater-4",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-4_1.mp3",
-  },
-  {
-    keyCode: "S",
-    id: "Clap",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Heater-6.mp3",
-  },
-  {
-    keyCode: "D",
-    id: "Open-HH",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Dsc_Oh.mp3",
-  },
-  {
-    keyCode: "Z",
-    id: "Kick-n'-Hat",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3",
-  },
-  {
-    keyCode: "X",
-    id: "Kick",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/RP4_KICK_1.mp3",
-  },
-  {
-    keyCode: "C",
-    id: "Closed-HH",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Cev_H2.mp3",
-  },
-];
-
-const bankTwo: BankType[] = [
-  {
-    keyCode: "Q",
-    id: "Chord-1",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3",
-  },
-  {
-    keyCode: "W",
-    id: "Chord-2",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Chord_2.mp3",
-  },
-  {
-    keyCode: "E",
-    id: "Chord-3",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Chord_3.mp3",
-  },
-  {
-    keyCode: "A",
-    id: "Shaker",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Give_us_a_light.mp3",
-  },
-  {
-    keyCode: "S",
-    id: "Open-HH",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Dry_Ohh.mp3",
-  },
-  {
-    keyCode: "D",
-    id: "Closed-HH",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Bld_H1.mp3",
-  },
-  {
-    keyCode: "Z",
-    id: "Punchy-Kick",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/punchy_kick_1.mp3",
-  },
-  {
-    keyCode: "X",
-    id: "Side-Stick",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/side_stick_1.mp3",
-  },
-  {
-    keyCode: "C",
-    id: "Snare",
-    url: "https://s3.amazonaws.com/freecodecamp/drums/Brk_Snr.mp3",
-  },
-];
-
-const activeStyle: React.CSSProperties = {
-  backgroundColor: "orange",
-  boxShadow: "0 3px black",
-  height: 77,
-  marginTop: 13,
-};
-
-const inactiveStyle: React.CSSProperties = {
-  backgroundColor: "#74b9ff",
-  marginTop: 10,
-  boxShadow: "3px 3px 5px black",
-};
-
-interface DrumPadProp {
-  keyCode: string;
-  clipId: string;
-  clip: string;
-  updateDisplay: (s: string) => void;
-}
-
-interface DrumPadState {
-  padStyle?: React.CSSProperties;
-  actived: boolean;
-}
-
-class DrumPad extends React.Component<DrumPadProp, DrumPadState> {
-  constructor(props: DrumPadProp) {
+class LengthControl extends React.Component<LengthControlProps> {
+  constructor(props: LengthControlProps) {
     super(props);
-    this.state = {
-      actived: false,
-    };
+    console.log(props);
   }
-  componentDidMount() {
-    document.addEventListener("keydown", this.handleKeyPress);
-  }
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyPress);
-  }
-  handleKeyPress = (e: KeyboardEvent) => {
-    let key = "";
-    if (e.key) {
-      key = e.key.toUpperCase();
-    }
-    if (key === this.props.keyCode) {
-      this.playSound();
-    }
+
+  handleIncresement = () => {
+    const count = this.props.count;
+    this.props.handleClick("+", count);
   };
-  toggleActive = () => {
-    this.setState((prevState, props) => {
-      return { actived: !prevState.actived };
-    });
+
+  handleDecresement = () => {
+    const count = this.props.count;
+    this.props.handleClick("-", count);
   };
-  playSound = () => {
-    const sound: HTMLAudioElement = document.getElementById(
-      this.props.keyCode
-    ) as HTMLAudioElement;
-    sound.currentTime = 0;
-    sound.play();
-    this.toggleActive();
-    // sound.addEventListener("ended", ()=>{})
-    setTimeout(() => this.toggleActive(), 100);
-    this.props.updateDisplay(this.props.clipId.replace(/-/g, " "));
-  };
+
   render() {
     return (
-      <div
-        id={this.props.clipId}
-        onClick={this.playSound}
-        className={this.state.actived ? "drum-pad actived" : "drum-pad"}
-        // className={"drum-pad actived"}
-        // style={this.state.padStyle}
-      >
-        <audio
-          className="clip"
-          id={this.props.keyCode}
-          src={this.props.clip}
-        ></audio>
-        {this.props.keyCode}
+      <div className="length-control">
+        <div
+          className="control-title"
+          id={this.props.type.toLowerCase() + "-label"}
+        >
+          {this.props.type + " Length"}
+        </div>
+        <button onClick={this.handleDecresement}>
+          <i
+            className="fa fa-arrow-down"
+            id={this.props.type.toLowerCase() + "-decrement"}
+          ></i>
+        </button>
+        <span id={this.props.type.toLowerCase() + "-length"}>
+          {this.props.count}
+        </span>
+        <button onClick={this.handleIncresement}>
+          <i
+            className="fa fa-arrow-up"
+            id={this.props.type.toLowerCase() + "-increment"}
+          ></i>
+        </button>
       </div>
     );
   }
 }
 
-interface PadBankState {
-  padStyle: React.CSSProperties;
-}
-interface PadBankProp {
-  currentPadBank: BankType[];
-  updateDisplay: (a: string) => void;
-}
-class PadBank extends React.Component<PadBankProp, PadBankState> {
-  constructor(props: PadBankProp) {
-    super(props);
-  }
-  render() {
-    let padBank = this.props.currentPadBank.map((drumObj, i) => {
-      return (
-        <DrumPad
-          clipId={drumObj.id}
-          key={i}
-          clip={drumObj.url}
-          keyCode={drumObj.keyCode}
-          updateDisplay={this.props.updateDisplay}
-        />
-      );
-    });
-    return <div className="pad-bank">{padBank}</div>;
-  }
+interface AppState {
+  timerType: LengthControlType;
+  timer: number;
+  brkLength: number;
+  seshLength: number;
+  timerState: "running" | "paused";
+  timerId: number;
+  warnning: boolean;
 }
 
-interface AppState {
-  display: string;
-  currentPadBank: BankType[];
-  currentPadBankId: string;
-  sliderVal: number;
+function formatTime(time_left: number) {
+  const min = Math.floor(time_left / 60);
+  const sec = time_left % 60;
+  return `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
 }
 
 class App extends React.Component<{}, AppState> {
+  audioBeep: HTMLAudioElement | null = null;
   constructor(props: {}) {
     super(props);
+
     this.state = {
-      display: String.fromCharCode(160),
-      currentPadBank: bankOne,
-      currentPadBankId: "Heater Kit",
-      sliderVal: 0.3,
+      timerType: "Session",
+      timer: 25 * 60,
+      brkLength: 5,
+      seshLength: 25,
+      timerState: "paused",
+      timerId: 0,
+      warnning: false,
     };
   }
 
-  displayClipName = (name: string) => {
+  handleReset = () => {
     this.setState({
-      display: name,
+      timerType: "Session",
+      timer: 25 * 60,
+      brkLength: 5,
+      seshLength: 25,
+      timerState: "paused",
+      warnning: false,
     });
+    this.audioBeep?.pause();
+    this.audioBeep!.currentTime = 0;
+    this.stopTimer();
   };
 
-  clearDisplay = () => {
-    this.setState({
-      display: String.fromCharCode(160),
-    });
+  handleSetBrkLength = (sign: string) => {
+    this.lengthConfig("brkLength", sign, this.state.brkLength, "Session");
   };
+
+  handleSetSeshLength = (sign: string) => {
+    this.lengthConfig("seshLength", sign, this.state.seshLength, "Break");
+  };
+
+  handlePlayOrStop = () => {
+    const timerState = this.state.timerState;
+    this.setState({
+      timerState: timerState === "running" ? "paused" : "running",
+    });
+    if (timerState === "paused") {
+      this.beginTimer();
+    } else {
+      this.stopTimer();
+    }
+  };
+
+  beginTimer() {
+    const timerId = setInterval(() => {
+      const { timer, timerState } = this.state;
+      if (timer == 0) {
+        this.stopTimer();
+        this.switchTimer();
+        return;
+      }
+      if (timerState === "paused") {
+        return;
+      }
+      this.setState({
+        timer: timer - 1,
+        timerId: timerId,
+      });
+    }, 1000);
+  }
+
+  switchTimer() {
+    this.audioBeep?.play();
+    this.setState({
+      warnning: true,
+    });
+    setTimeout(() => {
+      this.audioBeep?.pause();
+      const { timerType, brkLength, seshLength } = this.state;
+      const newTimer =
+        timerType === "Session" ? brkLength * 60 : seshLength * 60;
+      this.setState({
+        warnning: false,
+        timerType: timerType === "Session" ? "Break" : "Session",
+        timer: newTimer,
+      });
+      this.beginTimer();
+    }, 5000);
+  }
+
+  stopTimer() {
+    const timerId = this.state.timerId;
+    clearInterval(timerId);
+  }
+
+  lengthConfig(
+    stateToChange: string,
+    sign: string,
+    currentLength: number,
+    timerType: string
+  ) {
+    console.log(arguments);
+    console.log(this.state);
+    if (this.state.timerState === "running") {
+      return;
+    }
+    console.log(arguments);
+    if (this.state.timerType === timerType) {
+      if (sign === "-" && currentLength !== 1) {
+        this.setState({ [stateToChange]: currentLength - 1 } as unknown as Pick<
+          AppState,
+          keyof AppState
+        >);
+        console.log("---");
+      } else if (sign === "+" && currentLength !== 60) {
+        this.setState({ [stateToChange]: currentLength + 1 } as unknown as Pick<
+          AppState,
+          keyof AppState
+        >);
+        console.log("+++");
+      }
+    } else if (sign === "-" && currentLength !== 1) {
+      this.setState({
+        [stateToChange]: currentLength - 1,
+        timer: currentLength * 60 - 60,
+      } as unknown as Pick<AppState, keyof AppState>);
+    } else if (sign === "+" && currentLength !== 60) {
+      this.setState({
+        [stateToChange]: currentLength + 1,
+        timer: currentLength * 60 + 60,
+      } as unknown as Pick<AppState, keyof AppState>);
+    }
+  }
+
   render() {
     return (
-      <div id="drum-machine" className="inner-container">
-        <PadBank
-          updateDisplay={this.displayClipName}
-          currentPadBank={this.state.currentPadBank}
-        />
-
-        <div className="controls-container">
-          <p id="display">{this.state.display}</p>
+      <div className="container">
+        <div className="main-title">25 + 5 Clock</div>
+        <LengthControl
+          type="Break"
+          count={this.state.brkLength}
+          handleClick={this.handleSetBrkLength}
+        ></LengthControl>
+        <LengthControl
+          type="Session"
+          count={this.state.seshLength}
+          handleClick={this.handleSetSeshLength}
+        ></LengthControl>
+        <div
+          className="timer-container"
+          style={{
+            backgroundColor: this.state.warnning ? "red" : "transparent",
+          }}
+        >
+          <div className="timer-title" id="timer-label">
+            {this.state.warnning ? "warnning" : this.state.timerType}
+          </div>
+          <div className="countdown" id="time-left">
+            {formatTime(this.state.timer)}
+          </div>
         </div>
+        <div className="play-control">
+          <button id="start_stop" onClick={this.handlePlayOrStop}>
+            <i
+              className={
+                this.state.timerState === "running"
+                  ? "fas fa-pause"
+                  : "fa fa-play"
+              }
+            ></i>
+          </button>
+          <button id="reset" onClick={this.handleReset}>
+            <i className="fas fa-sync"></i>
+          </button>
+        </div>
+        <audio
+          id="beep"
+          preload="auto"
+          ref={(audio) => {
+            this.audioBeep = audio;
+          }}
+          src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+        />
       </div>
     );
   }
